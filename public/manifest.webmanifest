@@ -1,0 +1,10 @@
+{
+  "name": "EcoLog",
+  "short_name": "EcoLog",
+  "description": "나만의 생태 도감 — AI 생물 인식",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#D8F3DC",
+  "theme_color": "#1B4332",
+  "icons": []
+}
