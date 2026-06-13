@@ -2,9 +2,8 @@
 
 import Image from 'next/image';
 import { useCallback, useState } from 'react';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '@/components/AuthProvider';
-import { ensureFirebaseInitialized, getFirebaseStorage } from '@/lib/firebase';
+import { ensureFirebaseInitialized } from '@/lib/firebase';
 import { fileToBase64 } from '@/lib/file';
 import type { GeminiIdentifyResult } from '@/lib/types';
 import { saveIdentifiedObservation, saveUnknownObservation } from '@/lib/saveObservation';
@@ -68,11 +67,30 @@ export function UploadObservation({ onObserved }: Props) {
         setBusy(false);
         return;
       }
-      const storage = getFirebaseStorage();
-      const path = `observations/${user.uid}/${Date.now()}-${file.name.replace(/\s+/g, '_')}`;
-      const storageRef = ref(storage, path);
-      await uploadBytes(storageRef, file, { contentType: file.type || 'image/jpeg' });
-      const photoUrl = await getDownloadURL(storageRef);
+
+      let photoUrl = '';
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!uploadRes.ok) {
+          const errData = await uploadRes.json();
+          throw new Error(errData.error ?? 'upload_failed');
+        }
+
+        const blobData = await uploadRes.json();
+        photoUrl = blobData.url;
+      } catch (e) {
+        console.error(e);
+        setStatus('이미지 업로드에 실패했습니다.');
+        setBusy(false);
+        return;
+      }
 
       const url = URL.createObjectURL(file);
       setPreview(url);
