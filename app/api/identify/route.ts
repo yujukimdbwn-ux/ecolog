@@ -13,12 +13,21 @@ function stripCodeFences(text: string): string {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const imageBase64 = body.imageBase64 as string | undefined;
-    const mimeType = (body.mimeType as string) || 'image/jpeg';
+    const imageUrl = body.imageUrl as string | undefined;
 
-    if (!imageBase64) {
-      return Response.json({ error: 'missing_imageBase64' }, { status: 400 });
+    if (!imageUrl) {
+      return Response.json({ error: 'missing_imageUrl' }, { status: 400 });
     }
+
+    // Fetch image from Vercel Blob URL
+    const imageRes = await fetch(imageUrl);
+    if (!imageRes.ok) {
+      return Response.json({ error: `failed_to_fetch_image_from_url: ${imageRes.statusText}` }, { status: 400 });
+    }
+
+    const mimeType = imageRes.headers.get('content-type') || 'image/jpeg';
+    const arrayBuffer = await imageRes.arrayBuffer();
+    const imageBase64 = Buffer.from(arrayBuffer).toString('base64');
 
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {

@@ -4,7 +4,6 @@ import Image from 'next/image';
 import { useCallback, useState } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import { ensureFirebaseInitialized } from '@/lib/firebase';
-import { fileToBase64 } from '@/lib/file';
 import type { GeminiIdentifyResult } from '@/lib/types';
 import { saveIdentifiedObservation, saveUnknownObservation } from '@/lib/saveObservation';
 
@@ -98,11 +97,10 @@ export function UploadObservation({ onObserved }: Props) {
       setStatus('AI가 종을 분석하는 중…');
       let gemini: GeminiIdentifyResult | null = null;
       try {
-        const { base64, mimeType } = await fileToBase64(file);
         const res = await fetch('/api/identify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageBase64: base64, mimeType }),
+          body: JSON.stringify({ imageUrl: photoUrl }),
         });
         const data = await res.json();
         if (!res.ok) {
