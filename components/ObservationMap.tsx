@@ -3,8 +3,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   GoogleMap,
-  HeatmapLayer,
   Marker,
+  Circle,
   useJsApiLoader,
 } from '@react-google-maps/api';
 import {
@@ -24,12 +24,14 @@ const mapContainerStyle = {
 
 const defaultCenter = { lat: 37.5665, lng: 126.978 };
 
+const LIBRARIES: ("visualization" | "drawing" | "geometry" | "localContext" | "places")[] = ['visualization'];
+
 export function ObservationMap({ uid }: { uid: string }) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ?? '';
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'ecolog-google-maps',
     googleMapsApiKey: apiKey,
-    libraries: ['visualization'],
+    libraries: LIBRARIES,
   });
 
   const [mine, setMine] = useState<ObservationDoc[]>([]);
@@ -105,15 +107,21 @@ export function ObservationMap({ uid }: { uid: string }) {
         mapTypeControl: false,
       }}
     >
-      {allPoints.length > 0 && (
-        <HeatmapLayer
-          data={allPoints.map((p) => new google.maps.LatLng(p.lat, p.lng))}
+      {allPoints.map((p, idx) => (
+        <Circle
+          key={`all-pts-${idx}`}
+          center={p}
+          radius={200}
           options={{
-            radius: 36,
-            opacity: 0.55,
+            strokeColor: '#3B82F6',
+            strokeOpacity: 0.3,
+            strokeWeight: 1,
+            fillColor: '#3B82F6',
+            fillOpacity: 0.15,
+            clickable: false,
           }}
         />
-      )}
+      ))}
       {mine.map((o, i) =>
         o.lat != null && o.lng != null ? (
           <Marker

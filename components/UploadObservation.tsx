@@ -104,7 +104,8 @@ export function UploadObservation({ onObserved }: Props) {
         });
         const data = await res.json();
         if (!res.ok) {
-          throw new Error(data.error ?? 'identify_http_error');
+          console.error("Identify API error response:", data);
+          throw new Error(data.detail ? `${data.error}: ${data.detail}` : (data.error ?? 'identify_http_error'));
         }
         gemini = parseGeminiPayload(data);
       } catch (e) {
