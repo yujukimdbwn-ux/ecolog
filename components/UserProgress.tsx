@@ -34,9 +34,6 @@ export function UserProgress({ uid }: { uid: string }) {
           style={{ width: `${pct}%` }}
         />
       </div>
-      <p className="mt-2 text-xs text-eco-soft">
-        목표 종 수는 `.env`의 `NEXT_PUBLIC_TOTAL_SPECIES_GOAL`로 조정할 수 있어요.
-      </p>
     </div>
   );
 }
