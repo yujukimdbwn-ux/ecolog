@@ -24,7 +24,7 @@ const mapContainerStyle = {
 
 const defaultCenter = { lat: 37.5665, lng: 126.978 };
 
-const LIBRARIES: ("visualization" | "drawing" | "geometry" | "localContext" | "places")[] = ['visualization'];
+const LIBRARIES: any[] = ['visualization'];
 
 export function ObservationMap({ uid }: { uid: string }) {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ?? '';
